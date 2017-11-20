@@ -23,7 +23,7 @@ func getSecret(secret string) {
 		log.Error(err)
 	} else {
 		if b, err := json.Marshal(s); err != nil {
-			log.Error("error msarshalling secret")
+			log.Error("error marshalling secret")
 			log.Error(err)
 			return
 		} else {
