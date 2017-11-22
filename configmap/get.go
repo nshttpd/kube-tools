@@ -1,4 +1,4 @@
-package cmd
+package configmap
 
 import (
 	"encoding/json"
@@ -6,19 +6,13 @@ import (
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
-func init() {
-	RootCmd.AddCommand(getCmd)
-	getCmd.Flags().StringVar(&keyName, "name", "", "name of configmap item to fetch")
-}
+func GetConfigMap(cm string, namespace string, keyName string, kc *kubernetes.Clientset) {
 
-func getConfigMap(cm string) {
-	kc := loadClient()
-
-	configMap, err := kc.CoreV1().ConfigMaps(Namespace).Get(cm, metav1.GetOptions{})
+	configMap, err := kc.CoreV1().ConfigMaps(namespace).Get(cm, metav1.GetOptions{})
 	if err != nil {
 		log.WithFields(log.Fields{
 			"configmap": cm,
@@ -56,15 +50,4 @@ func getConfigMap(cm string) {
 			}
 		}
 	}
-}
-
-var getCmd = &cobra.Command{
-	Use:   "get [configmap]",
-	Short: "get configmap or configmap data from cluster",
-	Args:  cobra.ExactArgs(1),
-	Long: `get specified config map from cluster and save it as the same name in 'cwd'
-if -name option specified get that specific piece of configmap data.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		getConfigMap(args[0])
-	},
 }

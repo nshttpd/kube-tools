@@ -1,4 +1,4 @@
-package cmd
+package secrets
 
 import (
 	"encoding/json"
@@ -6,18 +6,13 @@ import (
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
-func init() {
-	RootCmd.AddCommand(getCmd)
-}
+func GetSecret(secret string, namespace string, kc *kubernetes.Clientset) {
 
-func getSecret(secret string) {
-	kc := loadClient()
-
-	s, err := kc.CoreV1().Secrets(Namespace).Get(secret, metav1.GetOptions{})
+	s, err := kc.CoreV1().Secrets(namespace).Get(secret, metav1.GetOptions{})
 	if err != nil {
 		log.Error("error getting secret from cluster")
 		log.Error(err)
@@ -36,14 +31,4 @@ func getSecret(secret string) {
 			return
 		}
 	}
-}
-
-var getCmd = &cobra.Command{
-	Use:   "get [secret]",
-	Short: "get secret from cluster",
-	Args:  cobra.ExactArgs(1),
-	Long:  `get specified secret from cluster and save it to a JSON file in 'cwd'`,
-	Run: func(cmd *cobra.Command, args []string) {
-		getSecret(args[0])
-	},
 }

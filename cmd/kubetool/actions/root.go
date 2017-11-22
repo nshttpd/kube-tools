@@ -1,13 +1,14 @@
-package cmd
+package actions
 
 import (
 	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -16,16 +17,27 @@ const (
 
 var (
 	Cluster   string
-	Namespace string
+	namespace string
 	logLevel  string
 	kubeConf  string
+	keyName   string
+	keyValue  string
 )
 
+func init() {
+	kc := fmt.Sprintf("%s/%s", os.Getenv("HOME"), DEFAULT_KUBE_CONFIG)
+
+	RootCmd.PersistentFlags().StringVarP(&Cluster, "cluster", "c", "", "cluster for secret manipulation")
+	RootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "default", "namespace for secret manipulation")
+	RootCmd.Flags().StringVar(&logLevel, "loglevel", "info", "log level")
+	RootCmd.Flags().StringVar(&kubeConf, "kube-conf", kc, "kubectl config file to use")
+}
+
 var RootCmd = &cobra.Command{
-	Use:   "kubesecret",
-	Short: "kubesecret CLI tool for Secret manipulation",
-	Long: `A simple CLI tool for manipulation of Kubernetes
-Secrets live and direct`,
+	Use:   "kubetool",
+	Short: "kubetool -  CLI tool for kubernetes data object manipulation",
+	Long: `A basic CLI tool for CRUD like operations on Secrets and ConfigMap
+objects in a Kubernetes cluster`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		l, err := log.ParseLevel(logLevel)
 		if err != nil {
@@ -43,15 +55,6 @@ Secrets live and direct`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
-}
-
-func init() {
-	kc := fmt.Sprintf("%s/%s", os.Getenv("HOME"), DEFAULT_KUBE_CONFIG)
-
-	RootCmd.PersistentFlags().StringVarP(&Cluster, "cluster", "c", "", "cluster for secret manipulation")
-	RootCmd.PersistentFlags().StringVarP(&Namespace, "namespace", "n", "default", "namespace for secret manipulation")
-	RootCmd.Flags().StringVar(&logLevel, "loglevel", "info", "log level")
-	RootCmd.Flags().StringVar(&kubeConf, "kube-conf", kc, "kubectl config file to use")
 }
 
 func loadClient() *kubernetes.Clientset {
