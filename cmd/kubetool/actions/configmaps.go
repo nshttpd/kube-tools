@@ -8,7 +8,11 @@ import (
 func init() {
 	RootCmd.AddCommand(cmRootCmd)
 	cmRootCmd.AddCommand(cmGetCmd)
+	cmRootCmd.AddCommand(cmCreateCmd)
+	cmRootCmd.AddCommand(cmDeleteCmd)
 	cmGetCmd.Flags().StringVar(&keyName, "name", "", "name of configmap item to fetch")
+	cmCreateCmd.Flags().StringVar(&keyName, "name", "", "name of item to add on creation")
+	cmCreateCmd.Flags().StringVar(&keyValue, "value", "", "value of item to add on creation")
 }
 
 var cmRootCmd = &cobra.Command{
@@ -33,15 +37,25 @@ if -name option specified get that specific piece of configmap data`,
 	},
 }
 
-var cmCreatecmd = &cobra.Command{
+var cmCreateCmd = &cobra.Command{
 	Use:   "create",
-	Short: "create configmap in cluster",
+	Short: "create configmap object",
 	Args:  cobra.ExactArgs(1),
 	Long:  `create a configmap either bare or with data`,
 	Run: func(cmd *cobra.Command, args []string) {
+		configmap.CreateConfigMap(args[0], cmd.Flag("namespace").Value.String(),
+			keyName, keyValue, loadClient())
 	},
 }
 
-// create
-// delete
+var cmDeleteCmd = &cobra.Command{
+	Use:   "delete",
+	Short: "delete configmap object",
+	Args:  cobra.ExactArgs(1),
+	Long:  `delete the specified ConfigMap object from the cluster`,
+	Run: func(cmd *cobra.Command, args []string) {
+		configmap.DeleteConfigMap(args[0], cmd.Flag("namespace").Value.String(), loadClient())
+	},
+}
+
 // update
