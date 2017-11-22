@@ -16,6 +16,7 @@ func UpdateSecret(secret string, namespace string, keyName string, keyValue stri
 			"secret": secret,
 		}).Error("error fetching secret")
 		log.Error(err)
+		return
 	}
 
 	if keyName != "" {
@@ -29,6 +30,7 @@ func UpdateSecret(secret string, namespace string, keyName string, keyValue stri
 		}
 	} else {
 		log.Error("missing secret value name to update")
+		return
 	}
 
 	ns, err := kc.CoreV1().Secrets(namespace).Update(s)
