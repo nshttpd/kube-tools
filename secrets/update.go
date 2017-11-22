@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"github.com/nshttpd/kube-tools/common"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -18,7 +19,7 @@ func UpdateSecret(secret string, namespace string, keyName string, keyValue stri
 	}
 
 	if keyName != "" {
-		m := createStringDataMap(keyName, keyValue)
+		m := common.CreateStringDataMap(keyName, keyValue)
 		if m != nil {
 			// set the StringData to what we are going to update. It will overwrite already
 			// existing values if they exist.
