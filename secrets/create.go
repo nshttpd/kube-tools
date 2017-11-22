@@ -1,42 +1,13 @@
 package secrets
 
 import (
-	"io/ioutil"
-	"strings"
-
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/nshttpd/kube-tools/common"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
-
-// creates a map that is the Secret key, value. When applied to the Secret
-// as v1.Secret.StringData and not v1.Secret.Data, the API server handles
-// the base64 encoding of the value data. This can only be used for non-binary
-// secret values.
-func createStringDataMap(keyName string, keyValue string) map[string]string {
-	// if the value starts with an @ it means read the data from a file
-	if strings.HasPrefix(keyValue, "@") {
-		// read it and reset the value to the actual file contents
-		if f, err := ioutil.ReadFile(keyValue[1:]); err != nil {
-			log.WithFields(log.Fields{
-				"keyName":  keyName,
-				"keyValue": keyValue,
-			}).Error("error reading file for secret")
-			log.Error(err)
-			return nil
-		} else {
-			keyValue = string(f[:])
-		}
-	}
-	// add the actual data to the secret
-	m := map[string]string{
-		keyName: keyValue,
-	}
-
-	return m
-}
 
 func CreateSecret(secret string, namespace string, keyName string, keyValue string, kc *kubernetes.Clientset) {
 
@@ -50,8 +21,11 @@ func CreateSecret(secret string, namespace string, keyName string, keyValue stri
 
 	// we've got a KeyName so we're going to create the
 	// Secret with some data.
+	// When applied to the Secret as v1.Secret.StringData and not v1.Secret.Data,
+	// the API server handles the base64 encoding of the value data. This can
+	// only be used for non-binary secret values.
 	if keyName != "" {
-		m := createStringDataMap(keyName, keyValue)
+		m := common.CreateStringDataMap(keyName, keyValue)
 		if m != nil {
 			s.StringData = m
 		} else {
