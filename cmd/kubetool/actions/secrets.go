@@ -27,7 +27,7 @@ var secretRootCmd = &cobra.Command{
 }
 
 var secretGetCmd = &cobra.Command{
-	Use:   "get [secret]",
+	Use:   "get",
 	Short: "get secret from cluster",
 	Args:  cobra.ExactArgs(1),
 	Long:  `get specified secret from cluster and save it to a JSON file in 'cwd'`,
@@ -37,7 +37,7 @@ var secretGetCmd = &cobra.Command{
 }
 
 var secretCreateCmd = &cobra.Command{
-	Use:   "create [secret]",
+	Use:   "create",
 	Args:  cobra.ExactArgs(1),
 	Short: "create a secret in the cluster",
 	Long:  `Create a secret in the cluster either bare or with data`,
@@ -48,7 +48,7 @@ var secretCreateCmd = &cobra.Command{
 }
 
 var secretDeleteCmd = &cobra.Command{
-	Use:   "delete [secret]",
+	Use:   "delete",
 	Short: "delete secret from cluster",
 	Args:  cobra.ExactArgs(1),
 	Long:  `delete specified secret from cluster`,
@@ -58,7 +58,7 @@ var secretDeleteCmd = &cobra.Command{
 }
 
 var secretUpdateCmd = &cobra.Command{
-	Use:   "update [secret]",
+	Use:   "update",
 	Args:  cobra.ExactArgs(1),
 	Short: "update an item in a secret",
 	Long:  `Update or add an item to a secret in the cluster`,
